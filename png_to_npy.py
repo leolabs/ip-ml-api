@@ -2,13 +2,18 @@ import numpy as np
 import imageio as iio
 from PIL import Image
 
+size = 28, 28
+
 def png_to_npy(file_path):
     npy_data = iio.imread(file_path)
-    im = Image.fromarray(npy_data).convert('L')
+    im = Image.fromarray(npy_data)
+    im = im.convert('L')
+    im.thumbnail(size, Image.ANTIALIAS)
     im.show()
-    #wenn speichern notwendig:
-    #np.save("test_file.npy", npy_data)
+
+    #speichern in datei: 
+    #np.save("output.npy", npy_data)
 
 if __name__ == "__main__":
-    file_path = '/home/user/Desktop/IP-ML API/PNG-Gradient_hex.png'
-    png_to_npy(file_path)
+    input_file = 'input.png'
+    png_to_npy(input_file)
