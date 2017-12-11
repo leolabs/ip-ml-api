@@ -29,6 +29,7 @@ from autobahn.asyncio.websocket import WebSocketServerProtocol, \
 
 # todo: import backend
 import sketch_converter
+import pickle
 
 class ApiWebsocketProtocol(WebSocketServerProtocol):
 
@@ -39,19 +40,20 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
         print("WebSocket connection open.")
 
     def onMessage(self, payload, isBinary):
+        sketch_conv = sketch_converter.SketchConverter()
 
         # process sketch (as .png) from the frontend
         if isBinary:
-            sketch_conv = sketch_converter.SketchConverter()
 
             try:
-                # convert .png to .npy, so that the backend can work with it
-                npy_data = sketch_conv.get_npy_data(payload)
+                # convert image to numpy array, so that the backend can work with it
+                image = pickle.loads(payload)
+                npy_data = sketch_conv.convert_to_numpy_array(image)
                 if npy_data is None: return None
 
                 # debugging
-                # print("received image")
-                # print(npy_data)
+                print("received image")
+                print(npy_data)
 
                 # todo: call and wait for backend method/s
 
