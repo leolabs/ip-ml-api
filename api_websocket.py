@@ -27,9 +27,10 @@
 from autobahn.asyncio.websocket import WebSocketServerProtocol, \
     WebSocketServerFactory
 
+# todo: import backend
 import sketch_converter
 
-class MyServerProtocol(WebSocketServerProtocol):
+class ApiWebsocketProtocol(WebSocketServerProtocol):
 
     def onConnect(self, request):
         print("Client connecting: {0}".format(request.peer))
@@ -38,18 +39,46 @@ class MyServerProtocol(WebSocketServerProtocol):
         print("WebSocket connection open.")
 
     def onMessage(self, payload, isBinary):
+
+        # process sketch (as .png) from the frontend
         if isBinary:
             sketch_conv = sketch_converter.SketchConverter()
-            npy_data = sketch_conv.get_npy_data(payload)
-            if npy_data is not None:
-                print("received image")
-                print(npy_data)
-                # todo: call backend method/s to identify what is depicted on the sketch
 
+            try:
+                # convert .png to .npy, so that the backend can work with it
+                npy_data = sketch_conv.get_npy_data(payload)
+                if npy_data is None: return None
+
+                # debugging
+                # print("received image")
+                # print(npy_data)
+
+                # todo: call and wait for backend method/s
+
+                # todo: construct .json out of results and labels
+
+                # send .json to the frontend
+                self.sendMessage("your sketch was identified as ...".encode('utf8'), isBinary=False)
+
+            except Exception:
+                return
+
+        # process sketch (as .ndjson) from the frontend 
         else:
-            decoded_payload = payload.decode('utf8')
-            # alter .ndjson data in payload if necessary
-            # call backend method
+            try:
+                decoded_payload = payload.decode('utf8')
+
+                # todo: alter payload if necessary, so that the backend can work with it
+
+                # todo: call and wait for backend method/s
+
+                # todo: construct .json out of results and labels
+
+                # send .json to the frontend
+                self.sendMessage("your sketch was identified as ...".encode('utf8'), isBinary=False)
+
+            except Exception:
+                return
 
         # echo back message verbatim
         self.sendMessage(payload, isBinary)
@@ -61,7 +90,7 @@ if __name__ == '__main__':
     import asyncio
 
     factory = WebSocketServerFactory(u"ws://127.0.0.1:9000")
-    factory.protocol = MyServerProtocol
+    factory.protocol = ApiWebsocketProtocol
 
     loop = asyncio.get_event_loop()
     coro = loop.create_server(factory, '0.0.0.0', 9000)
