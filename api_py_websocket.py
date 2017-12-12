@@ -63,7 +63,9 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
                 # todo: construct .json out of results and labels
 
                 # send .json to the frontend
-                #beispielcode, nicht korrekt: self.sendMessage(json.dumps().encode('utf8'), isBinary=False)
+                # import json
+                # payload = json.dumps([test]).encode('utf8')
+                # self.sendMessage(payload, isBinary=False)
                 self.sendMessage("your sketch was identified as ...".encode('utf8'), isBinary=False)
 
             except Exception:
