@@ -41,7 +41,7 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
     def onMessage(self, payload, isBinary):
         sketch_conv = sketch_converter.SketchConverter()
 
-        # process sketch (as .png) from the frontend
+        # process sketch from the frontend (assuming that is in a format that is supported by PIL)
         if isBinary:
             try:
                 # convert payload to numpy array, so that the backend can work with it
@@ -56,30 +56,35 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
                     return
 
                 # debugging
-                print(npy_data)
+                print(numpy_array)
 
                 # todo: call and wait for backend method/s
 
                 # todo: construct .json out of results and labels
 
                 # send .json to the frontend
+                #beispielcode, nicht korrekt: self.sendMessage(json.dumps().encode('utf8'), isBinary=False)
                 self.sendMessage("your sketch was identified as ...".encode('utf8'), isBinary=False)
 
             except Exception:
                 return
 
-        # process sketch (as .ndjson) from the frontend 
+        # process sketch from the frontend (assuming that it is in .ndjson format)
         else:
             try:
                 decoded_payload = payload.decode('utf8')
 
                 # todo: alter payload if necessary, so that the backend can work with it
+                # otherwise just pass the .ndjson data on to the backend in the next step
 
                 # todo: call and wait for backend method/s
 
                 # todo: construct .json out of results and labels
 
                 # send .json to the frontend
+                # import json
+                # payload = json.dumps([test]).encode('utf8')
+                # self.sendMessage(payload, isBinary=False)
                 self.sendMessage("your sketch was identified as ...".encode('utf8'), isBinary=False)
 
             except Exception:
