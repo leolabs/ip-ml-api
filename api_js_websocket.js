@@ -10,7 +10,7 @@ window.onload = function () {
     "use strict";
 
     // onclick handlers for buttons
-    var btnSendText = document.getElementById("sendTextButton")
+    var btnSendText = document.getElementById("sendTextButton");
     btnSendText.onclick = function () {
         let el = document.getElementById("text_input");
         if (el) {
@@ -21,21 +21,19 @@ window.onload = function () {
         }
     }
 
-    var btnSendBinary = document.getElementById("sendBinaryButton")
+    var btnSendBinary = document.getElementById("sendBinaryButton");
     btnSendBinary.onclick = function () {
         console.log("calling sendBinary() with:");
-        console.log(myFileList);
-        sendBinary(myFileList);
+        console.log(selected_file );
+        sendBinary(selected_file);
     }
 
     // onchange handler for file dialog choice
-    var myFileList = null;
-    var fileInput = null;
-
-    fileInput = document.getElementById("file_input");
+    var selected_file = null;
+    var fileInput = fileInput = document.getElementById("file_input");
     if (fileInput) {
         fileInput.onchange = function() {
-            myFileList = fileInput.files;
+            selected_file = fileInput.files[0];
         }
     } else {
         console.warn("Warning: file input not found");
@@ -86,16 +84,24 @@ function sendText(jsonString) {
 }
 
 //function to call when sending an image(png) thru the socket
-function sendBinary() {
+function sendBinary(file) {
     "use strict";
     if (isopen) {
-        var buf = new ArrayBuffer(32);
-        var arr = new Uint8Array(buf);
-        for (var i = 0; i < arr.length; ++i) {
-            arr[i] = i;
+        console.log("filename", file.name);
+        console.log("file size", file.size);
+       
+        var reader = new FileReader();
+        reader.onload = function () {
+            // debugging
+            console.log("result", reader.result);
+            console.log("error", reader.error);
+
+            // image transfer
+            socket.send(reader.result);
+            console.log("JS-Socket: Binary message sent.");
         }
-        socket.send(buf);
-        console.log("JS-Socket: Binary message sent.");
+        reader.readAsArrayBuffer(file);
+        console.log("state", reader.readyState);
     } else {
         console.log("JS-Socket: Connection not opened.");
     }
