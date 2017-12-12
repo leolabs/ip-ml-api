@@ -8,15 +8,42 @@ var isResultNew = false;
 //Initializing the WebSocket
 window.onload = function () {
     "use strict";
+
+    // onclick handlers for buttons
+    var btnSendText = document.getElementById("sendTextButton")
+    btnSendText.onclick = function () {
+        let el = document.getElementById("text_input");
+        if (el) {
+            let val = el.value;
+            console.log("calling sendText() with:");
+            console.log(val);
+            sendText(val);
+        }
+    }
+
+    var btnSendBinary = document.getElementById("sendBinaryButton")
+    btnSendBinary.onclick = function () {
+        console.log("calling sendBinary() with:");
+        console.log(myFileList);
+        sendBinary(myFileList);
+    }
+
+    // onchange handler for file dialog choice
+    var myFileList = null;
+    var fileInput = null;
+
+    fileInput = document.getElementById("file_input");
+    if (fileInput) {
+        fileInput.onchange = function() {
+            myFileList = fileInput.files;
+        }
+    } else {
+        console.warn("Warning: file input not found");
+    }
+
     //Currently the test and such the only port
     socket = new WebSocket("ws://127.0.0.1:9000");
     socket.binaryType = "arraybuffer";
-
-    //Callback when the socket opens
-    socket.onopen = function () {
-        console.log("JS-Socket: Connected!");
-        isopen = true;
-    };
 
     //Callback when the sockets recieves a message (should only be a result json here)
     socket.onmessage = function (result) {
@@ -27,6 +54,12 @@ window.onload = function () {
         } else {
             console.error("JS-Socket: Recieved response of wrong type");
         }
+    };
+
+    //Callback when the socket opens
+    socket.onopen = function (e) {
+        console.log("JS-Socket: Connected!");
+        isopen = true;
     };
 
     //Callback when the socket closes
@@ -41,7 +74,7 @@ window.onload = function () {
 function sendText(jsonString) {
     "use strict";
     if (isopen) {
-        if (typeof jsonString !== "String") {
+        if (typeof jsonString !== "string") {
             console.error("JS-Socket: Input has wrong type. String was expected");
         } else {
             socket.send(jsonString);
@@ -58,7 +91,7 @@ function sendBinary() {
     if (isopen) {
         var buf = new ArrayBuffer(32);
         var arr = new Uint8Array(buf);
-        for (i = 0; i < arr.length; ++i) {
+        for (var i = 0; i < arr.length; ++i) {
             arr[i] = i;
         }
         socket.send(buf);

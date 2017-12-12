@@ -44,12 +44,11 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
 
         # process sketch (as .png) from the frontend
         if isBinary:
-
             try:
-                # convert image to numpy array, so that the backend can work with it
+                # convert bytes to numpy array, so that the backend can work with it
                 image = pickle.loads(payload)
                 npy_data = sketch_conv.convert_to_numpy_array(image)
-                if npy_data is None: return None
+                if npy_data is None: return
 
                 # debugging
                 print("received image")

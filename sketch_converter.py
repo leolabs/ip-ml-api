@@ -20,5 +20,5 @@ if __name__ == "__main__":
         sketch_conv = SketchConverter()
         image_filepath = 'input.png'
         image = PIL.Image.open(image_filepath)
-        print(sketch_conv.convert_to_npy_array(image))
+        print(sketch_conv.convert_to_numpy_array(image))
 
