@@ -9,6 +9,65 @@
 
     <title>HTML-Testpage</title>
     <script src="api_js_websocket.js" type="text/javascript"></script>
+    <script>
+        //function to call when sending text thru the socket
+        function sendText(jsonString) {
+            "use strict";
+            if (isopen) {
+                if (typeof jsonString !== "string") {
+                    console.error("JS-Socket: Input has wrong type. String was expected");
+                } else {
+                    socket.send(jsonString);
+                    console.log("JS-Socket: Text message sent.");
+                }
+            } else {
+                console.log("JS-Socket: Connection not opened.");
+            }
+        }
+
+        //function to call when sending an image(png) thru the socket
+        function sendBinary(file) {
+            "use strict";
+            if (isopen) {
+                // debugging
+                console.log("filename", file.name);
+                console.log("file size", file.size);
+               
+                var reader = new FileReader();
+                reader.onload = function () {
+                    // debugging
+                    console.log("result", reader.result);
+                    console.log("error", reader.error);
+
+                    // image transfer
+                    socket.send(reader.result);
+                    console.log("JS-Socket: Binary message sent.");
+                }
+
+                // read file into buffer
+                reader.readAsArrayBuffer(file);
+                console.log("state", reader.readyState);
+            } else {
+                console.log("JS-Socket: Connection not opened.");
+            }
+        }
+
+        //function to call when manually calling for a result
+        function getResult() {
+            "use strict";
+            if (resultJSON == null) {
+                console.error("JS-Socket: Error - result not set");
+                return null;
+            }
+            //If result is set then
+            if (isResultNew) {
+                return resultJSON;
+            } else {
+                console.warn("caution: returning old result");
+                return resultJSON;
+            }
+        }
+    </script>
     <style>
         body {
             background: darkgrey;

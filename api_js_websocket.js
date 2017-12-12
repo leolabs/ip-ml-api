@@ -11,21 +11,29 @@ window.onload = function () {
 
     // onclick handlers for buttons
     var btnSendText = document.getElementById("sendTextButton");
-    btnSendText.onclick = function () {
-        let el = document.getElementById("text_input");
-        if (el) {
-            let val = el.value;
-            console.log("calling sendText() with:");
-            console.log(val);
-            sendText(val);
+    if (btnSendText) {
+        btnSendText.onclick = function () {
+            let el = document.getElementById("text_input");
+            if (el) {
+                let val = el.value;
+                console.log("calling sendText() with:");
+                console.log(val);
+                sendText(val);
+            }
         }
+    } else {
+        console.warn("Warning: send text button not found");
     }
 
     var btnSendBinary = document.getElementById("sendBinaryButton");
-    btnSendBinary.onclick = function () {
-        console.log("calling sendBinary() with:");
-        console.log(selected_file );
-        sendBinary(selected_file);
+    if (btnSendBinary) {
+        btnSendBinary.onclick = function () {
+            console.log("calling sendBinary() with:");
+            console.log(selected_file );
+            sendBinary(selected_file);
+        }
+    } else {
+        console.warn("Warning: send binary button not found");
     }
 
     // onchange handler for file dialog choice
@@ -67,58 +75,3 @@ window.onload = function () {
         isopen = false;
     };
 };
-
-//function to call when sending text thru the socket
-function sendText(jsonString) {
-    "use strict";
-    if (isopen) {
-        if (typeof jsonString !== "string") {
-            console.error("JS-Socket: Input has wrong type. String was expected");
-        } else {
-            socket.send(jsonString);
-            console.log("JS-Socket: Text message sent.");
-        }
-    } else {
-        console.log("JS-Socket: Connection not opened.");
-    }
-}
-
-//function to call when sending an image(png) thru the socket
-function sendBinary(file) {
-    "use strict";
-    if (isopen) {
-        console.log("filename", file.name);
-        console.log("file size", file.size);
-       
-        var reader = new FileReader();
-        reader.onload = function () {
-            // debugging
-            console.log("result", reader.result);
-            console.log("error", reader.error);
-
-            // image transfer
-            socket.send(reader.result);
-            console.log("JS-Socket: Binary message sent.");
-        }
-        reader.readAsArrayBuffer(file);
-        console.log("state", reader.readyState);
-    } else {
-        console.log("JS-Socket: Connection not opened.");
-    }
-}
-
-//function to call when manually calling for a result
-function getResult() {
-    "use strict";
-    if (resultJSON == null) {
-        console.error("JS-Socket: Error - result not set");
-        return null;
-    }
-    //If result is set then
-    if (isResultNew) {
-        return resultJSON;
-    } else {
-        console.warn("caution: returning old result");
-        return resultJSON;
-    }
-}
