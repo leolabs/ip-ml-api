@@ -41,25 +41,21 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
     def onMessage(self, payload, isBinary):
         sketch_conv = sketch_converter.SketchConverter()
 
-        print(isBinary)
         # process sketch (as .png) from the frontend
         if isBinary:
             try:
                 # convert payload to numpy array, so that the backend can work with it
-                print(sketch_conv)
-                print(sketch_conv.create_pil_image)
-
                 image = sketch_conv.create_pil_image(payload)
                 if image is None:
-                    print("attempt to open unsupported file occured")
+                    print("error: PIL can not operate on the given file")
+                    return
 
                 numpy_array = sketch_conv.convert_to_numpy_array(image)
                 if numpy_array is None:
-                    print("an conversion error occured")
+                    print("error: an exception was raised during the image conversion")
                     return
 
                 # debugging
-                print("received image")
                 print(npy_data)
 
                 # todo: call and wait for backend method/s
