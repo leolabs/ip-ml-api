@@ -29,74 +29,66 @@ from autobahn.asyncio.websocket import WebSocketServerProtocol, \
 
 # todo: import backend
 import sketch_converter
+import json
 
 class ApiWebsocketProtocol(WebSocketServerProtocol):
 
     def onConnect(self, request):
-        print("Client connecting: {0}".format(request.peer))
+        print("PY-Socket: Client connecting: {0}".format(request.peer))
 
     def onOpen(self):
-        print("WebSocket connection open.")
+        print("PY-Socket: WebSocket connection open")
 
     def onMessage(self, payload, isBinary):
-        sketch_conv = sketch_converter.SketchConverter()
+        message_type = "binary" if (isBinary is not None and isBinary) else "text"
+        print("PY-Socket: Received a {0} message".format(message_type))
 
-        # process sketch from the frontend (assuming that is in a format that is supported by PIL)
-        if isBinary:
-            try:
+        try:
+            sketch_conv = sketch_converter.SketchConverter()
+
+            # process sketch from the frontend (assuming that is in a format that is supported by PIL)
+            if isBinary:
+
                 # convert payload to numpy array, so that the backend can work with it
                 image = sketch_conv.create_pil_image(payload)
                 if image is None:
-                    print("error: PIL can not operate on the given file")
+                    self.sendMessage("error: PIL can not operate on the given file".encode('utf8'), isBinary=False)
                     return
 
                 numpy_array = sketch_conv.convert_to_numpy_array(image)
                 if numpy_array is None:
-                    print("error: an exception was raised during the image conversion")
+                    self.sendMessage("error: PIL can not convert the given file".encode('utf8'), isBinary=False)
                     return
 
-                # debugging
-                print(numpy_array)
+                backend_data = numpy_array
 
-                # todo: call and wait for backend method/s
-
-                # todo: construct .json out of results and labels
-
-                # send .json to the frontend
-                # import json
-                # payload = json.dumps([test]).encode('utf8')
-                # self.sendMessage(payload, isBinary=False)
-                self.sendMessage("your sketch was identified as ...".encode('utf8'), isBinary=False)
-
-            except Exception:
-                return
-
-        # process sketch from the frontend (assuming that it is in .ndjson format)
-        else:
-            try:
-                decoded_payload = payload.decode('utf8')
+            # process sketch from the frontend (assuming that it is in .ndjson format)
+            else:
+                backend_data = payload.decode('utf8')
 
                 # todo: alter payload if necessary, so that the backend can work with it
                 # otherwise just pass the .ndjson data on to the backend in the next step
 
-                # todo: call and wait for backend method/s
+            # debugging
+            print("Debug: backend data before processing | {0}".format(backend_data))
 
-                # todo: construct .json out of results and labels
+            # todo: call and wait for backend method/s
+            self.sendMessage("status: waiting for the backend to process your request".encode('utf8'), isBinary=False)    
+            # backend methods, e.g. backend.perform(backend_data)
 
-                # send .json to the frontend
-                # import json
-                # payload = json.dumps([test]).encode('utf8')
-                # self.sendMessage(payload, isBinary=False)
-                self.sendMessage("your sketch was identified as ...".encode('utf8'), isBinary=False)
+            # todo: construct .json out of results and labels
 
-            except Exception:
-                return
+            # send .json to the frontend
+            json_data = ['foo', {'bar': ('baz', None, 1.0, 2)}]
+            payload = json.dumps(json_data, ensure_ascii=False).encode('utf8')
+            self.sendMessage("status: your sketch was identified. results will arrive in the following message".encode('utf8'), isBinary=False)
+            self.sendMessage(payload, isBinary=False)
 
-        # echo back message verbatim
-        self.sendMessage(payload, isBinary)
+        except Exception:
+            return
 
     def onClose(self, wasClean, code, reason):
-        print("WebSocket connection closed: {0}".format(reason))
+        print("PY-Socket: WebSocket connection closed: {0}".format(reason))
 
 if __name__ == '__main__':
     import asyncio

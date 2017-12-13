@@ -18,10 +18,10 @@
                     console.error("JS-Socket: Input has wrong type. String was expected");
                 } else {
                     socket.send(jsonString);
-                    console.log("JS-Socket: Text message sent.");
+                    console.log("JS-Socket: Text message sent | ", jsonString);
                 }
             } else {
-                console.log("JS-Socket: Connection not opened.");
+                console.log("JS-Socket: Connection not opened");
             }
         }
 
@@ -30,25 +30,25 @@
             "use strict";
             if (isopen) {
                 // debugging
-                console.log("filename", file.name);
-                console.log("file size", file.size);
+                console.log("Debug: File name | ", file.name);
+                console.log("Debug: File size | ", file.size);
                
                 var reader = new FileReader();
                 reader.onload = function () {
                     // debugging
-                    console.log("result", reader.result);
-                    console.log("error", reader.error);
+                    console.log("Debug: File reader result | ", reader.result);
+                    console.log("Debug: File reader error | ", reader.error);
 
                     // image transfer
                     socket.send(reader.result);
-                    console.log("JS-Socket: Binary message sent.");
+                    console.log("JS-Socket: Binary message sent | ", file.name);
                 }
 
                 // read file into buffer
                 reader.readAsArrayBuffer(file);
-                console.log("state", reader.readyState);
+                console.log("Debug: File reader state | ", reader.readyState);
             } else {
-                console.log("JS-Socket: Connection not opened.");
+                console.log("JS-Socket: Connection not opened");
             }
         }
 
@@ -56,14 +56,14 @@
         function getResult() {
             "use strict";
             if (resultJSON == null) {
-                console.error("JS-Socket: Error - result not set");
+                console.error("JS-Socket: Error | result not set");
                 return null;
             }
             //If result is set then
             if (isResultNew) {
                 return resultJSON;
             } else {
-                console.warn("caution: returning old result");
+                console.warn("JS-Socket: Warning | returning old result");
                 return resultJSON;
             }
         }

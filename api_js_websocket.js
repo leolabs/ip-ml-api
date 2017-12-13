@@ -16,24 +16,20 @@ window.onload = function () {
             let el = document.getElementById("text_input");
             if (el) {
                 let val = el.value;
-                console.log("calling sendText() with:");
-                console.log(val);
                 sendText(val);
             }
         }
     } else {
-        console.warn("Warning: send text button not found");
+        console.warn("JS-Socket: Warning | send text button not found");
     }
 
     var btnSendBinary = document.getElementById("sendBinaryButton");
     if (btnSendBinary) {
         btnSendBinary.onclick = function () {
-            console.log("calling sendBinary() with:");
-            console.log(selected_file );
             sendBinary(selected_file);
         }
     } else {
-        console.warn("Warning: send binary button not found");
+        console.warn("JS-Socket: Warning", "[send binary button not found]");
     }
 
     // onchange handler for file dialog choice
@@ -44,7 +40,7 @@ window.onload = function () {
             selected_file = fileInput.files[0];
         }
     } else {
-        console.warn("Warning: file input not found");
+        console.warn("JS-Socket: Warning | file input not found");
     }
 
     //Currently the test and such the only port
@@ -54,7 +50,7 @@ window.onload = function () {
     //Callback when the sockets recieves a message (should only be a result json here)
     socket.onmessage = function (result) {
         if (typeof result.data === "string") {
-            console.log("Result text message received: " + result.data);
+            console.log("JS-Socket: Message received | ", result.data);
             resultJSON = result.data;
             isResultNew = true;
         } else {
@@ -64,13 +60,13 @@ window.onload = function () {
 
     //Callback when the socket opens
     socket.onopen = function (e) {
-        console.log("JS-Socket: Connected!");
+        console.log("JS-Socket: Connected");
         isopen = true;
     };
 
     //Callback when the socket closes
     socket.onclose = function (e) {
-        console.log("JS-Socket: Connection closed.");
+        console.log("JS-Socket: Connection closed");
         socket = null;
         isopen = false;
     };
