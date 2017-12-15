@@ -2,8 +2,6 @@
 
 var socket = null;
 var isopen = false;
-var resultJSON = null;
-var isResultNew = false;
 
 //Initializing the WebSocket
 window.onload = function () {
@@ -13,9 +11,9 @@ window.onload = function () {
     var btnSendText = document.getElementById("sendTextButton");
     if (btnSendText) {
         btnSendText.onclick = function () {
-            let el = document.getElementById("text_input");
+            var el = document.getElementById("text_input");
             if (el) {
-                let val = el.value;
+                var val = el.value;
                 sendText(val);
             }
         }
@@ -51,8 +49,7 @@ window.onload = function () {
     socket.onmessage = function (result) {
         if (typeof result.data === "string") {
             console.log("JS-Socket: Message received | ", result.data);
-            resultJSON = result.data;
-            isResultNew = true;
+            return result.data;
         } else {
             console.error("JS-Socket: Recieved response of wrong type");
         }
