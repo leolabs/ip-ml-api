@@ -36,7 +36,7 @@ window.onload = function () {
     var selected_file = null;
     var fileInput = fileInput = document.getElementById("file_input");
     if (fileInput) {
-        fileInput.onchange = function() {
+        fileInput.onchange = function () {
             selected_file = fileInput.files[0];
         }
     } else {
@@ -71,3 +71,45 @@ window.onload = function () {
         isopen = false;
     };
 };
+
+//function to call when sending text thru the socket
+function sendText(jsonString) {
+    "use strict";
+    if (isopen) {
+        if (typeof jsonString !== "string") {
+            console.error("JS-Socket: Input has wrong type. String was expected");
+        } else {
+            socket.send(jsonString);
+            console.log("JS-Socket: Text message sent | ", jsonString);
+        }
+    } else {
+        console.log("JS-Socket: Connection not opened");
+    }
+}
+
+//function to call when sending an image(png) thru the socket
+function sendBinary(file) {
+    "use strict";
+    if (isopen) {
+        // debugging
+        console.log("Debug: File name | ", file.name);
+        console.log("Debug: File size | ", file.size);
+
+        var reader = new FileReader();
+        reader.onload = function () {
+            // debugging
+            console.log("Debug: File reader result | ", reader.result);
+            console.log("Debug: File reader error | ", reader.error);
+
+            // image transfer
+            socket.send(reader.result);
+            console.log("JS-Socket: Binary message sent | ", file.name);
+        }
+
+        // read file into buffer
+        reader.readAsArrayBuffer(file);
+        console.log("Debug: File reader state | ", reader.readyState);
+    } else {
+        console.log("JS-Socket: Connection not opened");
+    }
+}
