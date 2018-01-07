@@ -29,7 +29,7 @@ class SketchConverter(object):
 
 if __name__ == "__main__":
         sketch_conv = SketchConverter()
-        image_filepath = 'input.png'
+        image_filepath = 'test.png'
         image = PIL.Image.open(image_filepath)
         print(sketch_conv.convert_to_numpy_array(image))
 

@@ -49,6 +49,7 @@ window.onload = function () {
     socket.onmessage = function (result) {
         if (typeof result.data === "string") {
             console.log("JS-Socket: Message received | ", result.data);
+            alert("JS-Socket: Message received\n\n" + result.data);
             return result.data;
         } else {
             console.error("JS-Socket: Recieved response of wrong type");

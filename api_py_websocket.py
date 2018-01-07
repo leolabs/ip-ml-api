@@ -27,9 +27,15 @@
 from autobahn.asyncio.websocket import WebSocketServerProtocol, \
     WebSocketServerFactory
 
+
+from SketchMe import SketchMe
+import numpy as np
 # todo: import backend
 import sketch_converter
 import json
+
+#debugging
+import PIL.Image
 
 class ApiWebsocketProtocol(WebSocketServerProtocol):
 
@@ -64,27 +70,53 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
 
             # process sketch from the frontend (assuming that it is in .ndjson format)
             else:
+                # interpret .ndjson data / text messages - this else block may be removed eventually (?)
                 backend_data = payload.decode('utf8')
 
                 # todo: alter payload if necessary, so that the backend can work with it
                 # otherwise just pass the .ndjson data on to the backend in the next step
 
-            # debugging
-            print("Debug: backend data before processing | {0}".format(backend_data))
-
             # todo: call and wait for backend method/s
             self.sendMessage("status: waiting for the backend to process your request".encode('utf8'), isBinary=False)    
-            # backend methods, e.g. backend.perform(backend_data)
+            Backend = SketchMe()
+            Backend.Create_Model()
 
-            # todo: construct .json out of results and labels
+            # this is test code for the default images - may be removed eventually
+            #test_image = np.load("DATA/ant.npy")
+            #test_npy_data = test_image[-1]
+            #print("test npy data")
+            #print(test_npy_data)
+            #print("prediction")
+            #results = Backend.Predict(test_npy_data)
+            #print(results)
+
+            # this is where the received data is used
+            results = Backend.Predict(backend_data)
+
+            # construct json for categorized results
+            with open('DATA/categories.txt') as f:
+                self.categories = f.readlines()
+
+            export_data = {}
+            for i in range(0, len(self.categories)):
+                category_key = self.categories[i].lower().replace('\n', '').replace(' ', '_').replace('-', '_')
+                export_data[category_key] = "{0}".format(results[0][i])
 
             # send .json to the frontend
-            json_data = ['foo', {'bar': ('baz', None, 1.0, 2)}]
-            payload = json.dumps(json_data, ensure_ascii=False).encode('utf8')
+            payload = json.dumps(export_data, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': ')).encode('utf8')            
             self.sendMessage("status: your sketch was identified. results will arrive in the following message".encode('utf8'), isBinary=False)
             self.sendMessage(payload, isBinary=False)
 
-        except Exception:
+            # debugging:
+            print("[numpy array]\n")
+            print(backend_data)
+            print("[prediction results]\n")
+            print(results)
+            print("[export json]\n")
+            print(payload)
+
+        except Exception as e:
+            print(e)
             return
 
     def onClose(self, wasClean, code, reason):
