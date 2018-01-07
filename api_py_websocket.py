@@ -94,7 +94,7 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
             results = Backend.Predict(backend_data)
 
             # construct json for categorized results
-            with open('DATA/categories.txt') as f:
+            with open('categories.txt') as f:
                 self.categories = f.readlines()
 
             export_data = {}
