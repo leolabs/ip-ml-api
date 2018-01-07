@@ -30,12 +30,8 @@ from autobahn.asyncio.websocket import WebSocketServerProtocol, \
 
 from SketchMe import SketchMe
 import numpy as np
-# todo: import backend
 import sketch_converter
 import json
-
-#debugging
-import PIL.Image
 
 class ApiWebsocketProtocol(WebSocketServerProtocol):
 
@@ -76,10 +72,33 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
                 # todo: alter payload if necessary, so that the backend can work with it
                 # otherwise just pass the .ndjson data on to the backend in the next step
 
-            # todo: call and wait for backend method/s
+            # call and wait for backend method/s
             self.sendMessage("status: waiting for the backend to process your request".encode('utf8'), isBinary=False)    
             Backend = SketchMe()
             Backend.Create_Model()
+            prediction_results = Backend.Predict(backend_data)
+
+            # construct json for categorized results
+            with open('categories.txt') as f:
+                self.categories = f.readlines()
+
+            export_data = {}
+            for i in range(0, len(self.categories)):
+                category_key = self.categories[i].lower().replace('\n', '').replace(' ', '_').replace('-', '_')
+                export_data[category_key] = "{0}".format(prediction_results[0][i])
+
+            # send .json to the frontend
+            payload = json.dumps(export_data, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': ')).encode('utf8')            
+            self.sendMessage("status: your sketch was identified. results will arrive in the following message".encode('utf8'), isBinary=False)
+            self.sendMessage(payload, isBinary=False)
+
+            # debugging:
+            print("[numpy array]\n")
+            print(numpy_array)
+            print("[prediction results]\n")
+            print(prediction_results)
+            print("[export json]\n")
+            print(payload)
 
             # this is test code for the default images - may be removed eventually
             #test_image = np.load("DATA/ant.npy")
@@ -89,31 +108,6 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
             #print("prediction")
             #results = Backend.Predict(test_npy_data)
             #print(results)
-
-            # this is where the received data is used
-            results = Backend.Predict(backend_data)
-
-            # construct json for categorized results
-            with open('categories.txt') as f:
-                self.categories = f.readlines()
-
-            export_data = {}
-            for i in range(0, len(self.categories)):
-                category_key = self.categories[i].lower().replace('\n', '').replace(' ', '_').replace('-', '_')
-                export_data[category_key] = "{0}".format(results[0][i])
-
-            # send .json to the frontend
-            payload = json.dumps(export_data, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': ')).encode('utf8')            
-            self.sendMessage("status: your sketch was identified. results will arrive in the following message".encode('utf8'), isBinary=False)
-            self.sendMessage(payload, isBinary=False)
-
-            # debugging:
-            print("[numpy array]\n")
-            print(backend_data)
-            print("[prediction results]\n")
-            print(results)
-            print("[export json]\n")
-            print(payload)
 
         except Exception as e:
             print(e)
