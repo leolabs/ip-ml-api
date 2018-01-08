@@ -76,25 +76,28 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
             self.sendMessage("status: waiting for the backend to process your request".encode('utf8'), isBinary=False)    
             Backend = SketchMe()
             Backend.Create_Model()
-            prediction_results = Backend.Predict(backend_data)
+            prediction_results = Backend.Predict(backend_data)[0]
 
             # construct json for categorized results
             with open('categories.txt') as f:
                 self.categories = f.readlines()
 
             export_data = {}
-            for i in range(0, len(self.categories)):
-                category_key = self.categories[i].lower().replace('\n', '').replace(' ', '_').replace('-', '_')
-                export_data[category_key] = "{0}".format(prediction_results[0][i])
+            for i in range(0, 5):
+                # print(prediction_results)
+                result_index = prediction_results.argmax()
+                category_key = self.categories[result_index].lower().replace('\n', '').replace(' ', '_').replace('-', '_')
+                export_data[category_key] = "{0}".format(prediction_results[result_index])
+                prediction_results[result_index] = 0.0 # set it to zero, so that the next iteration will return the second highest number, and so on...
 
-            # send .json to the frontend
-            payload = json.dumps(export_data, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ': ')).encode('utf8')            
+            # send the prepared .json to the frontend
+            payload = json.dumps(export_data, ensure_ascii=False, indent=4, separators=(',', ': ')).encode('utf8')            
             self.sendMessage("status: your sketch was identified. results will arrive in the following message".encode('utf8'), isBinary=False)
             self.sendMessage(payload, isBinary=False)
 
             # debugging:
             print("[numpy array]\n")
-            print(numpy_array)
+            print(numpy_array) 
             print("[prediction results]\n")
             print(prediction_results)
             print("[export json]\n")
