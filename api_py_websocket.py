@@ -75,7 +75,7 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
             # consult backend to get image prediction results
             self.sendMessage("status: waiting for the backend to process your request".encode('utf8'), isBinary=False)    
             Backend = SketchMe()
-            Backend.Create_Model() #todo: LoadModel
+            Backend.Load_Model() # Create_Model()
             prediction_results = Backend.Predict(backend_data)[0]
 
             # construct json with categorized results
