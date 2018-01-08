@@ -18,7 +18,7 @@ window.onload = function () {
             }
         }
     } else {
-        console.warn("JS-Socket: Warning | send text button not found");
+        console.warn("JS-Socket: send text button not found");
     }
 
     var btnSendBinary = document.getElementById("sendBinaryButton");
@@ -27,7 +27,7 @@ window.onload = function () {
             sendBinary(selected_file);
         }
     } else {
-        console.warn("JS-Socket: Warning", "[send binary button not found]");
+        console.warn("JS-Socket: send binary button not found");
     }
 
     // onchange handler for file dialog choice
@@ -38,7 +38,7 @@ window.onload = function () {
             selected_file = fileInput.files[0];
         }
     } else {
-        console.warn("JS-Socket: Warning | file input not found");
+        console.warn("JS-Socket: file input not found");
     }
 
     //Currently the test and such the only port
@@ -78,7 +78,7 @@ function sendText(jsonString) {
             console.error("JS-Socket: Input has wrong type. String was expected");
         } else {
             socket.send(jsonString);
-            console.log("JS-Socket: Text message sent | ", jsonString);
+            console.log("JS-Socket: Text message sent\n\n" + jsonString);
         }
     } else {
         console.log("JS-Socket: Connection not opened");

@@ -27,7 +27,8 @@
 from autobahn.asyncio.websocket import WebSocketServerProtocol, \
     WebSocketServerFactory
 
-
+import sys
+sys.path.append('../ip-ml-tensorflow')
 from SketchMe import SketchMe
 import numpy as np
 import sketch_converter
@@ -66,25 +67,23 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
 
             # process sketch from the frontend (assuming that it is in .ndjson format)
             else:
-                # interpret .ndjson data / text messages - this else block may be removed eventually (?)
+                # interpret .ndjson data
                 backend_data = payload.decode('utf8')
+                self.sendMessage("status: backend doesn't support .ndjson data yet".encode('utf8'), isBinary=False)    
+                return
 
-                # todo: alter payload if necessary, so that the backend can work with it
-                # otherwise just pass the .ndjson data on to the backend in the next step
-
-            # call and wait for backend method/s
+            # consult backend to get image prediction results
             self.sendMessage("status: waiting for the backend to process your request".encode('utf8'), isBinary=False)    
             Backend = SketchMe()
-            Backend.Create_Model()
+            Backend.Create_Model() #todo: LoadModel
             prediction_results = Backend.Predict(backend_data)[0]
 
-            # construct json for categorized results
+            # construct json with categorized results
             with open('categories.txt') as f:
                 self.categories = f.readlines()
 
             export_data = {}
             for i in range(0, 5):
-                # print(prediction_results)
                 result_index = prediction_results.argmax()
                 category_key = self.categories[result_index].lower().replace('\n', '').replace(' ', '_').replace('-', '_')
                 export_data[category_key] = "{0}".format(prediction_results[result_index])
@@ -96,14 +95,15 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
             self.sendMessage(payload, isBinary=False)
 
             # debugging:
-            print("[numpy array]\n")
-            print(numpy_array) 
-            print("[prediction results]\n")
-            print(prediction_results)
-            print("[export json]\n")
-            print(payload)
+            # print("--- debugging ---")
+            # print("numpy array:")
+            # print(numpy_array) 
+            # print("prediction results:")
+            # print(prediction_results)
+            # print("export json:")
+            # print(payload)
 
-            # this is test code for the default images - may be removed eventually
+            # test code for prediction of default images provided by QuickDraw - may be removed eventually
             #test_image = np.load("DATA/ant.npy")
             #test_npy_data = test_image[-1]
             #print("test npy data")
