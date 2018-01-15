@@ -49,36 +49,27 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
         try:
             sketch_conv = sketch_converter.SketchConverter()
 
-            # process sketch from the frontend (assuming that is in a format that is supported by PIL)
+            # received binary data - assuming that it is an sketch in a image format
             if isBinary:
-
-                # convert payload to numpy array, so that the backend can work with it
-                image = sketch_conv.create_pil_image(payload)
+                image = sketch_converter.SketchConverter().convert_image(payload)
                 if image is None:
-                    self.sendMessage("error: PIL can not operate on the given file".encode('utf8'), isBinary=False)
+                    self.sendMessage("error: API does not accept the given file (must be in .png format)".encode('utf8'), isBinary=False)
                     return
 
-                numpy_array = sketch_conv.convert_to_numpy_array(image)
-                if numpy_array is None:
-                    self.sendMessage("error: PIL can not convert the given file".encode('utf8'), isBinary=False)
-                    return
+                backend_data = image
 
-                backend_data = numpy_array
-
-            # process sketch from the frontend (assuming that it is in .ndjson format)
+            # received non-binary data - assuming that it is an sketch in .ndjson format
             else:
-                # interpret .ndjson data
                 backend_data = payload.decode('utf8')
                 self.sendMessage("status: backend doesn't support .ndjson data yet".encode('utf8'), isBinary=False)    
                 return
 
-            # consult backend to get image prediction results
-            self.sendMessage("status: waiting for the backend to process your request".encode('utf8'), isBinary=False)    
+            # pass the sketch on to the backend  
             Backend = SketchMe()
             Backend.Load_Model() # Create_Model()
             prediction_results = Backend.Predict(backend_data)[0]
 
-            # construct json with categorized results
+            # construct response for the frontend as .json with categorized prediction results
             with open('categories.txt') as f:
                 self.categories = f.readlines()
 
@@ -91,26 +82,13 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
 
             # send the prepared .json to the frontend
             payload = json.dumps(export_data, ensure_ascii=False, indent=4, separators=(',', ': ')).encode('utf8')            
-            self.sendMessage("status: your sketch was identified. results will arrive in the following message".encode('utf8'), isBinary=False)
             self.sendMessage(payload, isBinary=False)
 
-            # debugging:
-            # print("--- debugging ---")
-            # print("numpy array:")
-            # print(numpy_array) 
-            # print("prediction results:")
-            # print(prediction_results)
-            # print("export json:")
-            # print(payload)
-
             # test code for prediction of default images provided by QuickDraw - may be removed eventually
-            #test_image = np.load("DATA/ant.npy")
-            #test_npy_data = test_image[-1]
-            #print("test npy data")
-            #print(test_npy_data)
-            #print("prediction")
-            #results = Backend.Predict(test_npy_data)
-            #print(results)
+            # test_npy_data = np.load("DATA/ant.npy")[-1]
+            # results = Backend.Predict(test_npy_data)
+            # print("test npy data\n", test_npy_data)            
+            # print("prediction\n", results)
 
         except Exception as e:
             print(e)
