@@ -12,6 +12,8 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
 
     def onConnect(self, request):
         print("PY-Socket: Client connecting: {0}".format(request.peer))
+        self.backend = SketchMe()
+        self.backend.Load_Model()
 
     def onOpen(self):
         print("PY-Socket: WebSocket connection open")
@@ -29,15 +31,13 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
                     return
 
                 # pass the sketch on to the backend  
-                Backend = SketchMe()
-                Backend.Load_Model()
-                prediction_results = Backend.Predict(sketch_data)[0]
+                prediction_results = self.backend.Predict(sketch_data)[0]
 
                 # construct response for the frontend as .json with categorized prediction results
                 export_data = {}
                 for i in range(0, 5):
                     result_index = prediction_results.argmax()
-                    category_key = Backend.catNames[result_index].lower().replace('\n', '').replace(' ', '_').replace('-', '_')
+                    category_key = self.backend.catNames[result_index].lower().replace('\n', '').replace(' ', '_').replace('-', '_')
                     export_data[category_key] = "{0}".format(prediction_results[result_index])
                     prediction_results[result_index] = 0.0 # set it to zero, so that the next iteration will return the second highest number, and so on...
 
