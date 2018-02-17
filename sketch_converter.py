@@ -1,4 +1,5 @@
 import PIL.Image
+import PIL.ImageOps
 import numpy
 import io
 
@@ -9,7 +10,8 @@ class SketchConverter(object):
             image = PIL.Image.open(io.BytesIO(binary_data))
             if isinstance(image, PIL.PngImagePlugin.PngImageFile):
                 image = image.resize(size=(28,28), resample=PIL.Image.ANTIALIAS)
-                image = image.convert(mode='L')
+                image = PIL.ImageOps.grayscale(image)
+                # image = PIL.ImageOps.invert(image)
                 return numpy.array(image)
 
             return None
