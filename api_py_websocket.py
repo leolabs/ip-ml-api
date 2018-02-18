@@ -3,14 +3,15 @@ from autobahn.asyncio.websocket import WebSocketServerProtocol, \
 
 import sys
 import os
+
 sys.path.append('ip-ml-tensorflow')
 from SketchMe import SketchMe
 import numpy as np
 import sketch_converter
 import json
 
-class ApiWebsocketProtocol(WebSocketServerProtocol):
 
+class ApiWebsocketProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         print("PY-Socket: Client connecting: {0}".format(request.peer))
         self.backend = SketchMe()
@@ -38,9 +39,12 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
                 export_data = {}
                 for i in range(0, 5):
                     result_index = prediction_results.argmax()
-                    category_key = self.backend.catNames[result_index].lower().replace('\n', '').replace(' ', '_').replace('-', '_')
+                    category_key = self.backend.catNames[result_index].lower().replace('\n', '').replace(' ',
+                                                                                                         '_').replace(
+                        '-', '_')
                     export_data[category_key] = "{0}".format(prediction_results[result_index])
-                    prediction_results[result_index] = 0.0 # set it to zero, so that the next iteration will return the second highest number, and so on...
+                    prediction_results[
+                        result_index] = 0.0  # set it to zero, so that the next iteration will return the second highest number, and so on...
 
                 # send the prepared .json to the frontend
                 response = json.dumps(export_data, ensure_ascii=False, indent=4, separators=(',', ': ')).encode('utf8')
@@ -49,7 +53,9 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
             # treat incoming messages in text format as sketches in .ndjson format
             else:
                 sketch_data = message.decode('utf8')
-                self.sendMessage("Backend doesn't have support for .ndjson data! No results have been returned.".encode('utf8'), isBinary=False)
+                self.sendMessage(
+                    "Backend doesn't have support for .ndjson data! No results have been returned.".encode('utf8'),
+                    isBinary=False)
                 return
 
         except Exception as e:
@@ -58,10 +64,11 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
     def onClose(self, wasClean, code, reason):
         print("PY-Socket: WebSocket connection closed: {0}".format(reason))
 
+
 if __name__ == '__main__':
     import asyncio
 
-    factory = WebSocketServerFactory(u"ws://127.0.0.1:" + os.environ['PORT'])
+    factory = WebSocketServerFactory('wss://0.0.0.0:' + os.environ['PORT'])
     factory.protocol = ApiWebsocketProtocol
 
     loop = asyncio.get_event_loop()
