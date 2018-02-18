@@ -3,7 +3,7 @@ from autobahn.asyncio.websocket import WebSocketServerProtocol, \
 
 import sys
 import os
-sys.path.append('../ip-ml-tensorflow')
+sys.path.append('ip-ml-tensorflow')
 from SketchMe import SketchMe
 import numpy as np
 import sketch_converter
