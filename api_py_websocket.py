@@ -68,7 +68,7 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
 if __name__ == '__main__':
     import asyncio
 
-    factory = WebSocketServerFactory('wss://0.0.0.0:' + os.environ['PORT'])
+    factory = WebSocketServerFactory('wss://0.0.0.0:443')
     factory.protocol = ApiWebsocketProtocol
 
     loop = asyncio.get_event_loop()
