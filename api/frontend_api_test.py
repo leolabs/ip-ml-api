@@ -32,17 +32,19 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
 
     def onConnect(self, request):
         print("PY-Socket: Client connecting: {0}".format(request.peer))
+        self.backend = SketchMe()
+        self.backend.Load_Model()
 
     def onOpen(self):
         print("PY-Socket: WebSocket connection open")
 
-    def onMessage(self, payload, isBinary):
+    def onMessage(self, message, isBinary):
         message_type = "binary" if (isBinary is not None and isBinary) else "text"
         print("PY-Socket: Received a {0} message".format(message_type))
 
         try:
             # consult backend to get image prediction results
-            self.sendMessage("status: waiting for the backend to process your request".encode('utf8'), isBinary=False)    
+            self.sendMessage("status: waiting for the backend to process your request".encode('utf8'), isBinary=False)
 
             # construct json with categorized results
             export_data = {}
@@ -53,7 +55,7 @@ class ApiWebsocketProtocol(WebSocketServerProtocol):
             export_data['ant'] = "0.13079054653644562"
 
             # send the prepared .json to the frontend
-            payload = json.dumps(export_data, ensure_ascii=False, indent=4, separators=(',', ': ')).encode('utf8')            
+            payload = json.dumps(export_data, ensure_ascii=False, indent=4, separators=(',', ': ')).encode('utf8')
             self.sendMessage(payload, isBinary=False)
 
         except Exception as e:
@@ -80,4 +82,3 @@ if __name__ == '__main__':
     finally:
         server.close()
         loop.close()
-
