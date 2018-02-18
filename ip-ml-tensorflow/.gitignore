@@ -1,0 +1,10 @@
+DATA/**
+#Pycharm umgebung
+.idea/**
+#pycache
+__pycache__
+
+*.swp
+*.h5
+*.hdf5
+*.pyc

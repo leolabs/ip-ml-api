@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+   ml:
+     environment:
+       - PORT=9000
+     image: ml
+     volumes:
+       - .:/media
+     ports:
+       - "9000:9000"
