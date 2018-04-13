@@ -4,6 +4,7 @@ services:
    ml:
      environment:
        - PORT=9000
+       - WSS_PORT=9000
      image: ml
      volumes:
        - .:/media
