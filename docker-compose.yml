@@ -5,8 +5,13 @@ services:
      environment:
        - PORT=9000
        - WSS_PORT=9000
-     image: ml
+     build: .
      volumes:
        - .:/media
      ports:
        - "9000:9000"
+
+   frontend:
+     build: frontend
+     ports:
+       - "8081:8081"
