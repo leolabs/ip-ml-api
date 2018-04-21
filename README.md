@@ -13,6 +13,10 @@ Damit das API lauffähig ist werden folgende Abhängigkeiten benötigt:
 
   Library, die das WebSocket Protocol in Python implementiert. Wird von SketchMe zur Kommunikation zwischen API und Frontend benötigt.
 
+* PIL
+  
+  Library zum Einlesen und Bearbeiten von Bilddaten. Wird von SketchMe benötigt, um Bilddaten anzupassen und sie numpy bereitzustellen.
+
 ## Erläuterung
 
 Das API implementiert einen WebSocket zum Datenaustausch mit dem Frontend. Es importiert das Backend und kann auf dessen Funktionalität zugreifen.
