@@ -13,6 +13,14 @@ $ docker-compose up
 Daraufhin ist der Demonstrator unter `http://localhost:8081/#localhost:9000`
 verfügbar.
 
+## Backend
+
+Die Dokumentation ist hier verfügbar: [Backend Dokumentation](https://github.com/leolabs/ip-ml-api/blob/master/ip-ml-tensorflow/README.md)
+
+## Frontend
+
+Die Dokumentation ist hier verfügbar: [Frontend](https://github.com/leolabs/ip-ml-frontend/blob/master/README.md)
+
 ## Abhängigkeiten
 
 Damit das API lauffähig ist werden folgende Abhängigkeiten benötigt:
@@ -29,7 +37,7 @@ Damit das API lauffähig ist werden folgende Abhängigkeiten benötigt:
   zur Kommunikation zwischen API und Frontend benötigt.
 
 * PIL
-  
+
   Library zum Einlesen und Bearbeiten von Bilddaten. Wird von SketchMe benötigt, um Bilddaten anzupassen und sie numpy bereitzustellen.
 
 ## Erläuterung
