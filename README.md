@@ -3,8 +3,9 @@
 ## Quick Start
 
 Um den Demonstrator zu starten, werden [Docker](https://www.docker.com/get-docker)
-und Docker Compose benötigt. Zum Starten des Projektes muss das Repository lokal
-geklont und in der Shell der folgende Command ausgeführt werden:
+und [Docker Compose](https://docs.docker.com/compose/install/) benötigt.
+Zum Starten des Projektes muss das Repository lokal geklont und in der Shell
+der folgende Command ausgeführt werden:
 
 ```
 $ docker-compose up
@@ -38,7 +39,8 @@ Damit das API lauffähig ist werden folgende Abhängigkeiten benötigt:
 
 * PIL
 
-  Library zum Einlesen und Bearbeiten von Bilddaten. Wird von SketchMe benötigt, um Bilddaten anzupassen und sie numpy bereitzustellen.
+  Library zum Einlesen und Bearbeiten von Bilddaten. Wird von SketchMe benötigt,
+  um Bilddaten anzupassen und sie numpy bereitzustellen.
 
 ## Erläuterung
 
