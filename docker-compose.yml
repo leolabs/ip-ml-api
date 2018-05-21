@@ -10,8 +10,10 @@ services:
        - .:/media
      ports:
        - "9000:9000"
+     restart: always
 
    frontend:
      build: frontend
      ports:
        - "8081:8081"
+     restart: always
